@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Future</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,500&family=Poppins:wght@300;400;600&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body{
+  font-family:'Poppins',sans-serif;
+  background:radial-gradient(ellipse at top,#1a0b2e 0%,#0d0518 60%,#050208 100%);
+  color:#fff; min-height:100vh; overflow-x:hidden; cursor:none;
+}
+.cursor{
+  position:fixed; width:18px; height:18px; border-radius:50%;
+  background:radial-gradient(circle,#ff8fd8 0%,#ff5fa8 70%);
+  pointer-events:none; z-index:9999; mix-blend-mode:screen;
+  transform:translate(-50%,-50%); transition:transform .1s ease;
+  box-shadow:0 0 20px #ff5fa8,0 0 40px #ff5fa8;
+}
+.page-wrap{
+  position:relative; min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:60px 20px; z-index:2;
+}
+h2{
+  font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4.5vw,2.6rem); margin-bottom:30px;
+  background:linear-gradient(90deg,#ffd7f0,#ffb3e0,#ffd700,#ffb3e0);
+  background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:shimmer 5s linear infinite;
+}
+@keyframes shimmer{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+.promises{
+  max-width:650px; width:100%; text-align:left; margin-bottom:30px;
+}
+.promise-item{
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,182,220,.25);
+  backdrop-filter:blur(14px); border-radius:16px; padding:18px 24px; margin-bottom:14px;
+  font-family:'Playfair Display',serif; font-size:1.05rem; color:#ffe3f5;
+  opacity:0; transform:translateX(-30px);
+}
+.final-note{
+  font-family:'Playfair Display',serif; font-style:italic; font-size:1.25rem;
+  color:#ffd700; margin:20px 0 10px; opacity:0;
+}
+.dobo-tag{
+  font-size:.9rem; color:#c9a3ff; margin-bottom:30px; opacity:0;
+}
+.nav-button{
+  padding:16px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg,#ff5fa8,#ff8a5c); color:#fff; font-size:1rem; font-weight:600;
+  cursor:pointer; box-shadow:0 0 25px rgba(255,95,168,.6); transition:all .3s ease;
+  text-decoration:none; display:inline-block; opacity:0;
+}
+.nav-button:hover{ transform:translateY(-4px) scale(1.05); box-shadow:0 8px 35px rgba(255,95,168,.85); }
+.floating-heart{
+  position:fixed; bottom:-50px; font-size:20px; pointer-events:none; z-index:1; opacity:.8;
+  animation:floatUp linear forwards;
+}
+@keyframes floatUp{ to{ transform:translateY(-110vh) rotate(360deg); opacity:0; } }
+.music-toggle{
+  position:fixed; top:20px; right:20px; z-index:100; background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,182,220,.4); color:#fff; border-radius:50%; width:46px; height:46px;
+  font-size:18px; cursor:pointer; backdrop-filter:blur(8px);
+}
+</style>
+</head>
+<body>
+<div class="cursor"></div>
+<button class="music-toggle" id="musicBtn">🔇</button>
+<audio id="bgMusic" src="music.mp3" loop></audio>
+
+<div class="page-wrap">
+  <h2>Manifest kru choo k aa bahda thaayee hopeing for the best 🌙</h2>
+  <div class="promises">
+    <div class="promise-item">mari aam iccha che k gee aapne bond che ee saem jaaye ane aanu kai sare ahji bond ma  convert thayee man mari puri life sara sathe bitawi che aawi mari iccha che badhu tara hatma chee have joo tme .</div>
+     <div class="promise-item">i hope hu  tara badha sapna sachaa thay, ane hu tari baju ma ubho rahi sauthi vadhu khush thau. ane tara sapna pura thawanu nimmit hu banu tme life maa badhu achive kro je tme wichar kro che</div>
+   </div>
+  <p class="final-note" id="finalNote">Happy Birthday Dobo</p>
+  <p class="dobo-tag">— puri dil thi, tara dobo tarafthi 💗</p>
+  <a href="index.html" class="nav-button">Back to the Beginning 🔁</a>
+</div>
+
+<script>
+const cursor = document.querySelector('.cursor');
+document.addEventListener('mousemove', e=>{
+  cursor.style.left = e.clientX+'px';
+  cursor.style.top = e.clientY+'px';
+});
+gsap.to("h2",{opacity:1,y:0,duration:1,ease:"power3.out"});
+gsap.to(".promise-item",{opacity:1,x:0,stagger:0.25,duration:.8,delay:.4,ease:"power2.out"});
+gsap.to("#finalNote",{opacity:1,duration:1.2,delay:2});
+gsap.to(".dobo-tag",{opacity:1,duration:1,delay:2.6});
+gsap.to(".nav-button",{opacity:1,duration:1,delay:3.2});
+
+function spawnHeart(){
+  const h = document.createElement('div');
+  h.className='floating-heart';
+  h.textContent = ['💗','💕','💖','✨','🌙'][Math.floor(Math.random()*5)];
+  h.style.left = Math.random()*100+'vw';
+  h.style.animationDuration = (6+Math.random()*6)+'s';
+  h.style.fontSize = (14+Math.random()*18)+'px';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),13000);
+}
+setInterval(spawnHeart,700);
+
+const music = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('musicBtn');
+let playing = false;
+musicBtn.addEventListener('click',()=>{
+  if(!playing){ music.play().catch(()=>{}); musicBtn.textContent='🔊'; playing=true; }
+  else { music.pause(); musicBtn.textContent='🔇'; playing=false; }
+});
+</script>
+</body>
+</html>

@@ -1,23 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-    
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Dobo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,500&family=Poppins:wght@300;400;600&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body{
+  font-family:'Poppins',sans-serif;
+  background:radial-gradient(ellipse at top,#1a0b2e 0%,#0d0518 60%,#050208 100%);
+  color:#fff; min-height:100vh; overflow-x:hidden; cursor:none;
+}
+.cursor{
+  position:fixed; width:18px; height:18px; border-radius:50%;
+  background:radial-gradient(circle,#ff8fd8 0%,#ff5fa8 70%);
+  pointer-events:none; z-index:9999; mix-blend-mode:screen;
+  transform:translate(-50%,-50%); transition:transform .1s ease;
+  box-shadow:0 0 20px #ff5fa8,0 0 40px #ff5fa8;
+}
+.container{
+  position:relative; min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:40px 20px; z-index:2;
+}
+
+/* ===== PHOTO FRAME (top image) ===== */
+.photo-frame{
+  width:180px; height:180px; border-radius:18px; overflow:hidden; margin-bottom:24px;
+  border:3px solid rgba(255,182,220,.5); box-shadow:0 0 30px rgba(255,95,168,.5);
+  opacity:0; transform:scale(.7); position:relative;
+}
+.photo-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
+.frame-photo{
+  position:absolute; top:0; left:0; opacity:0; transition:opacity 1s ease;
+}
+.frame-photo.active{ opacity:1; }
+
+h1{
+  font-family:'Playfair Display',serif; font-size:clamp(2rem,6vw,3.5rem); margin-bottom:20px;
+  background:linear-gradient(90deg,#ffd7f0,#ffb3e0,#ffd700,#ffb3e0);
+  background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:shimmer 5s linear infinite; opacity:0;
+}
+@keyframes shimmer{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+.greeting{
+  font-size:1.1rem; color:#f0d9ff; max-width:600px; min-height:60px; margin-bottom:20px;
+  font-style:italic; opacity:0;
+}
+
+/* ===== CAKE (click to blow the candle) ===== */
+.cake-wrap{
+  position:relative; margin-bottom:28px; opacity:0; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; user-select:none;
+}
+.cake-emoji{ font-size:4.2rem; line-height:1; filter:drop-shadow(0 6px 18px rgba(255,95,168,.45)); transition:transform .25s ease; }
+.cake-wrap:hover .cake-emoji{ transform:scale(1.06) rotate(-2deg); }
+.candle-flame{
+  position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+  font-size:1.4rem; animation:flicker 1s ease-in-out infinite alternate;
+  filter:drop-shadow(0 0 8px #ffb347);
+}
+@keyframes flicker{ 0%{ transform:translateX(-50%) scale(1) rotate(-2deg);} 100%{ transform:translateX(-50%) scale(1.12) rotate(2deg);} }
+.candle-flame.blown{ opacity:0; animation:none; }
+.cake-hint{
+  margin-top:10px; font-size:.8rem; color:#d9b3f0; font-style:italic; opacity:.85;
+}
+.cake-hint.done{ color:#ffd700; }
+
+.cta-button{
+  padding:16px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg,#ff5fa8,#ff8a5c); color:#fff; font-size:1rem; font-weight:600;
+  cursor:pointer; box-shadow:0 0 25px rgba(255,95,168,.6); transition:all .3s ease;
+  text-decoration:none; display:inline-block; opacity:0;
+}
+.cta-button:hover{ transform:translateY(-4px) scale(1.05); box-shadow:0 8px 35px rgba(255,95,168,.85); }
+.floating-heart{
+  position:fixed; bottom:-50px; font-size:20px; pointer-events:none; z-index:1; opacity:.8;
+  animation:floatUp linear forwards;
+}
+@keyframes floatUp{ to{ transform:translateY(-110vh) rotate(360deg); opacity:0; } }
+.music-toggle{
+  position:fixed; top:20px; right:20px; z-index:100; background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,182,220,.4); color:#fff; border-radius:50%; width:46px; height:46px;
+  font-size:18px; cursor:pointer; backdrop-filter:blur(8px);
+}
+
+/* ===== READY PROMPT (Yes / No step) ===== */
+.ready-overlay{
+  position:fixed; inset:0; z-index:200; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:30px 20px;
+  background:radial-gradient(ellipse at top,#1a0b2e 0%,#0d0518 60%,#050208 100%);
+  opacity:0; visibility:hidden; transition:opacity .5s ease;
+}
+.ready-overlay.show{ opacity:1; visibility:visible; }
+.ready-question{
+  font-family:'Playfair Display',serif; font-size:clamp(1.4rem,4.5vw,2.4rem);
+  max-width:640px; margin-bottom:14px; color:#ffe3f5;
+}
+.ready-sub{
+  font-size:.95rem; color:#d9b3f0; margin-bottom:36px; min-height:22px;
+}
+.ready-btn-row{
+  display:flex; gap:22px; position:relative; width:100%; max-width:420px;
+  justify-content:center; align-items:center; min-height:70px;
+}
+.yes-btn{
+  padding:15px 34px; border:none; border-radius:50px;
+  background:linear-gradient(135deg,#ff5fa8,#ff8a5c); color:#fff; font-size:1rem; font-weight:600;
+  cursor:pointer; box-shadow:0 0 25px rgba(255,95,168,.6); transition:transform .3s ease,box-shadow .3s ease;
+}
+.yes-btn:hover{ transform:translateY(-4px) scale(1.06); box-shadow:0 8px 35px rgba(255,95,168,.85); }
+.no-btn{
+  padding:15px 34px; border-radius:50px; border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.06); color:#f0d9ff; font-size:1rem; font-weight:600;
+  cursor:pointer; position:fixed; transition:top .25s ease, left .25s ease;
+}
+</style>
 </head>
 <body>
-    <div class="cursor"></div>
-    <div class="container">
-        <h1>Happy Birthday Priya💗</h1>
-        <div class="greeting"></div>
-        <button class="cta-button">Click to Enter Our World 💕</button>
-    </div>
+<div class="cursor"></div>
+<button class="music-toggle" id="musicBtn">🔇</button>
+<audio id="bgMusic" src="music.mp3" loop></audio>
 
-    <script src="script.js">
-        
-    </script>
+<div class="container" id="landing">
+  <!-- 🔥 Top photo — cycles through a few images. Add/remove <img> tags as needed -->
+  <div class="photo-frame" id="photoFrame">
+    <img src="n1.jpg" alt="Dobo" class="frame-photo active">
+    <img src="n2.jpg" alt="Dobo" class="frame-photo">
+    <img src="n3.jpg" alt="Dobo" class="frame-photo">
+    
+    <img src="n6.jpg" alt="Dobo" class="frame-photo">
+  </div>
+
+  <h1>Happy Birthday Dobo 💗</h1>
+  <div class="greeting" id="greetText"></div>
+
+  <!-- 🔥 Clickable cake — click to blow out the candle -->
+  <div class="cake-wrap" id="cakeWrap">
+    <span class="candle-flame" id="candleFlame">🔥</span>
+    <span class="cake-emoji">🎂</span>
+    <span class="cake-hint" id="cakeHint">Blow out the candle 🕯️</span>
+  </div>
+
+  <button class="cta-button" id="enterBtn">Click to Enter Your World 💕</button>
+</div>
+
+<!-- ===== READY PROMPT ===== -->
+<div class="ready-overlay" id="readyOverlay">
+  <div class="ready-question">Are you ready to see the surprise I made for you? ✨</div>
+  <div class="ready-sub" id="readySub"></div>
+  <div class="ready-btn-row">
+    <button class="yes-btn" id="yesBtn">Yes 💗</button>
+    <button class="no-btn" id="noBtn">No</button>
+  </div>
+</div>
+
+<script>
+const cursor = document.querySelector('.cursor');
+document.addEventListener('mousemove', e=>{
+  cursor.style.left = e.clientX+'px';
+  cursor.style.top = e.clientY+'px';
+});
+
+gsap.to(".photo-frame",{opacity:1,scale:1,duration:1,ease:"back.out(1.7)",delay:.2});
+gsap.to("h1",{opacity:1,y:0,duration:1.2,ease:"power3.out",delay:.5});
+gsap.fromTo("h1",{y:-30},{y:0,opacity:1,duration:1.2,delay:.5});
+gsap.to(".greeting",{opacity:1,duration:1,delay:1.1});
+gsap.to(".cake-wrap",{opacity:1,duration:1,delay:1.6});
+gsap.to(".cta-button",{opacity:1,duration:1,delay:2.1});
+
+const lines = [
+  "Today the world got a little more beautiful, because it's your day.",
+   "This little world I made... is just for you and could be for Us."
+];
+let li=0, ci=0;
+const greetEl = document.getElementById('greetText');
+function typeLine(){
+  if(li>=lines.length) return;
+  if(ci<=lines[li].length){
+    greetEl.textContent = lines[li].slice(0,ci);
+    ci++;
+    setTimeout(typeLine,45);
+  } else {
+    setTimeout(()=>{ li++; ci=0; if(li<lines.length) typeLine(); },1600);
+  }
+}
+setTimeout(typeLine,1200);
+
+function spawnHeart(){
+  const h = document.createElement('div');
+  h.className='floating-heart';
+  h.textContent = ['💗','💕','💖','✨'][Math.floor(Math.random()*4)];
+  h.style.left = Math.random()*100+'vw';
+  h.style.animationDuration = (6+Math.random()*6)+'s';
+  h.style.fontSize = (14+Math.random()*18)+'px';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),13000);
+}
+setInterval(spawnHeart,600);
+
+const music = document.getElementById('bgMusic');
+
+/* ===== PHOTO CAROUSEL: auto-cycle the top photo-frame images ===== */
+const framePhotos = document.querySelectorAll('.frame-photo');
+if (framePhotos.length > 1) {
+  let photoIndex = 0;
+  setInterval(() => {
+    framePhotos[photoIndex].classList.remove('active');
+    photoIndex = (photoIndex + 1) % framePhotos.length;
+    framePhotos[photoIndex].classList.add('active');
+  }, 2800);
+}
+
+const musicBtn = document.getElementById('musicBtn');
+let playing = false;
+musicBtn.addEventListener('click',()=>{
+  if(!playing){ music.play().catch(()=>{}); musicBtn.textContent='🔊'; playing=true; }
+  else { music.pause(); musicBtn.textContent='🔇'; playing=false; }
+});
+
+/* ===== CAKE LOGIC: click to blow out the candle ===== */
+const cakeWrap = document.getElementById('cakeWrap');
+const candleFlame = document.getElementById('candleFlame');
+const cakeHint = document.getElementById('cakeHint');
+let candleBlown = false;
+
+cakeWrap.addEventListener('click', ()=>{
+  if(candleBlown) return;
+  candleBlown = true;
+  candleFlame.classList.add('blown');
+  cakeHint.textContent = 'Yayy! Make a wish 🌟';
+  cakeHint.classList.add('done');
+
+  const rect = cakeWrap.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+  for(let i=0;i<14;i++){
+    const spark = document.createElement('div');
+    spark.textContent = ['✨','💫','🎉','💗'][Math.floor(Math.random()*4)];
+    spark.style.position='fixed';
+    spark.style.left = cx+'px';
+    spark.style.top = cy+'px';
+    spark.style.fontSize = (14+Math.random()*14)+'px';
+    spark.style.pointerEvents='none';
+    spark.style.zIndex = 300;
+    document.body.appendChild(spark);
+    const angle = Math.random()*Math.PI*2;
+    const dist = 60 + Math.random()*90;
+    gsap.to(spark,{
+      x: Math.cos(angle)*dist,
+      y: Math.sin(angle)*dist - 20,
+      opacity:0,
+      duration:1 + Math.random()*.6,
+      ease:"power2.out",
+      onComplete:()=>spark.remove()
+    });
+  }
+});
+
+/* ===== READY PROMPT LOGIC ===== */
+const enterBtn = document.getElementById('enterBtn');
+const readyOverlay = document.getElementById('readyOverlay');
+const readySub = document.getElementById('readySub');
+const noBtn = document.getElementById('noBtn');
+const yesBtn = document.getElementById('yesBtn');
+
+const nagMessages = [
+  "You have to be ready to see it — click Yes please, Dobo 💗",
+  "Come on, just say yes 🥺",
+  "No isn't really an option here...",
+  "The surprise is waiting, Dobo 💕",
+  "Okay fine, but Yes is right there 👉"
+];
+let nagIndex = 0;
+let noPositioned = false;
+
+enterBtn.addEventListener('click', ()=>{
+  document.getElementById('landing').style.display = 'none';
+  readyOverlay.classList.add('show');
+});
+
+function placeNoBtnInitial(){
+  const rect = yesBtn.getBoundingClientRect();
+  noBtn.style.top = rect.top + 'px';
+  noBtn.style.left = (rect.right + 22) + 'px';
+  noPositioned = true;
+}
+
+function dodgeNoBtn(){
+  const btnW = noBtn.offsetWidth || 140;
+  const btnH = noBtn.offsetHeight || 50;
+  const maxX = window.innerWidth - btnW - 20;
+  const maxY = window.innerHeight - btnH - 20;
+  const newX = Math.max(20, Math.random() * maxX);
+  const newY = Math.max(20, Math.random() * maxY);
+  noBtn.style.left = newX + 'px';
+  noBtn.style.top = newY + 'px';
+
+  readySub.textContent = nagMessages[nagIndex % nagMessages.length];
+  nagIndex++;
+}
+
+noBtn.addEventListener('mouseenter', dodgeNoBtn);
+noBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); dodgeNoBtn(); }, { passive:false });
+noBtn.addEventListener('click', (e)=>{ e.preventDefault(); dodgeNoBtn(); });
+
+yesBtn.addEventListener('click', ()=>{
+  window.location.href = 'story.html';
+});
+
+const observer = new MutationObserver(()=>{
+  if(readyOverlay.classList.contains('show') && !noPositioned){
+    placeNoBtnInitial();
+  }
+});
+observer.observe(readyOverlay, { attributes:true, attributeFilter:['class'] });
+window.addEventListener('resize', ()=>{ if(noPositioned) placeNoBtnInitial(); });
+</script>
 </body>
 </html>

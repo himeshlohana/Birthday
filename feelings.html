@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What I Feel For You and What you mean for me</menu></title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,500&family=Poppins:wght@300;400;600&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body{
+  font-family:'Poppins',sans-serif;
+  background:radial-gradient(ellipse at top,#1a0b2e 0%,#0d0518 60%,#050208 100%);
+  color:#fff; min-height:100vh; overflow-x:hidden; cursor:none;
+}
+.cursor{
+  position:fixed; width:18px; height:18px; border-radius:50%;
+  background:radial-gradient(circle,#ff8fd8 0%,#ff5fa8 70%);
+  pointer-events:none; z-index:9999; mix-blend-mode:screen;
+  transform:translate(-50%,-50%); transition:transform .1s ease;
+  box-shadow:0 0 20px #ff5fa8,0 0 40px #ff5fa8;
+}
+.page-wrap{
+  position:relative; min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:60px 20px; z-index:2;
+}
+h2{
+  font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4.5vw,2.6rem); margin-bottom:30px;
+  background:linear-gradient(90deg,#ffd7f0,#ffb3e0,#ffd700,#ffb3e0);
+  background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:shimmer 5s linear infinite;
+}
+@keyframes shimmer{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+.card{
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,182,220,.25);
+  backdrop-filter:blur(14px); border-radius:24px; padding:40px; max-width:680px;
+  box-shadow:0 10px 50px rgba(255,95,168,.15);
+}
+.letter{
+  font-family:'Playfair Display',serif; font-size:1.05rem; line-height:1.9; color:#ffe3f5;
+  text-align:left; white-space:pre-line; opacity:0;
+}
+.signature{
+  margin-top:20px; text-align:right; font-family:'Playfair Display',serif; font-style:italic;
+  color:#ffd700; font-size:1.2rem; opacity:0;
+}
+.nav-button{
+  margin-top:36px; padding:16px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg,#ff5fa8,#ff8a5c); color:#fff; font-size:1rem; font-weight:600;
+  cursor:pointer; box-shadow:0 0 25px rgba(255,95,168,.6); transition:all .3s ease;
+  text-decoration:none; display:inline-block;
+}
+.nav-button:hover{ transform:translateY(-4px) scale(1.05); box-shadow:0 8px 35px rgba(255,95,168,.85); }
+.floating-heart{
+  position:fixed; bottom:-50px; font-size:20px; pointer-events:none; z-index:1; opacity:.8;
+  animation:floatUp linear forwards;
+}
+@keyframes floatUp{ to{ transform:translateY(-110vh) rotate(360deg); opacity:0; } }
+.music-toggle{
+  position:fixed; top:20px; right:20px; z-index:100; background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,182,220,.4); color:#fff; border-radius:50%; width:46px; height:46px;
+  font-size:18px; cursor:pointer; backdrop-filter:blur(8px);
+}
+</style>
+</head>
+<body>
+<div class="cursor"></div>
+<button class="music-toggle" id="musicBtn">🔇</button>
+<audio id="bgMusic" src="music.mp3" loop></audio>
+
+<div class="page-wrap">
+  <h2>What I Feel For You 💌</h2>
+  <div class="card">
+    <p class="letter" id="feelText">Hu kharekhar nathi janato ke mara feelings ne words ma kem muki shaku. Pan ek vaat khari chhe... je divas thi tu mari life ma aavi chhe, tyarthi ghani badhi vastu badlai gayi chhe.
+
+Tari sathe vaat karu tyare mane ajeebo-gareeb sukoon male chhe. Tari ek smile maro puro divas sari rite badli nakhe chhe. Ane jyare tu dukhi hoy ke chup thai jaay chhe, tyare mara dil ne pan shanti nathi malti. Hu bas etluj ichhu chu ke tari life ma jetlu pan dukh chhe, e dhime dhime door thai jai ane fari thi tari aankho ma e j chamak ane hasi joi shaku.
+
+Hu promise nathi karto ke hu perfect chu. Hu promise nathi karto ke darek situation ma badhu sachu j karish. Pan etlu jarur kahish ke hu hamesha tara mate sachcho rahish. Tari khushi ma mari khushi chhe, ane tari taklif ma hu pan andar thi tuti jau chu.
+
+Tu mara mate fakta koi person nathi... tu e feeling chhe je mane shanti aape chhe. Tu e dua chhe je hu roj mangva lago chu. Tu e reason chhe ke hu future vishe sapna jovu lago chu.
+
+Jo kyarek tane lage ke badhu khatam thai rahyu chhe, to bas ek vaar mari yaad kari leje. Hu hamesha tari side par ubho rahish. Hu tane judge nahi karu, bas sambhalish, samajish ane sathe chalish.
+
+Ane ek vaat hamesha yaad rakhje... duniya ma ghana loko aavse ane jashe, pan mara dil ma tari jagya koi pan kyare lai nahi shake.
+
+Bas mari roj ni ekaj dua chhe... Bhagwan tane hamesha khush rakhe, tari badhi taklifo jaldi door kare, ane tari smile kyare pan ochhi na thay. Karan ke tari smile j mara mate duniya ni sauthi sundar vastu chhe.
+
+Forever... hu hamesha tari sathe chu. ❤️</p>
+    <p class="signature" id="sig">— forever yours, dobo 💗</p>
+  </div>
+  <a href="manifestation.html" class="nav-button">Manifesting ➡️</a>
+</div>
+
+<script>
+const cursor = document.querySelector('.cursor');
+document.addEventListener('mousemove', e=>{
+  cursor.style.left = e.clientX+'px';
+  cursor.style.top = e.clientY+'px';
+});
+gsap.to("h2",{opacity:1,y:0,duration:1,ease:"power3.out"});
+gsap.fromTo(".card",{opacity:0,y:40},{opacity:1,y:0,duration:1.2,delay:.3});
+gsap.to("#feelText",{opacity:1,duration:1.5,delay:.8});
+gsap.to("#sig",{opacity:1,duration:1,delay:2.2});
+gsap.fromTo(".nav-button",{opacity:0},{opacity:1,duration:1,delay:2.8});
+
+function spawnHeart(){
+  const h = document.createElement('div');
+  h.className='floating-heart';
+  h.textContent = ['💗','💕','💖','✨'][Math.floor(Math.random()*4)];
+  h.style.left = Math.random()*100+'vw';
+  h.style.animationDuration = (6+Math.random()*6)+'s';
+  h.style.fontSize = (14+Math.random()*18)+'px';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),13000);
+}
+setInterval(spawnHeart,700);
+
+const music = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('musicBtn');
+let playing = false;
+musicBtn.addEventListener('click',()=>{
+  if(!playing){ music.play().catch(()=>{}); musicBtn.textContent='🔊'; playing=true; }
+  else { music.pause(); musicBtn.textContent='🔇'; playing=false; }
+});
+</script>
+</body>
+</html>

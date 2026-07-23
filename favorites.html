@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Favorite</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,500&family=Poppins:wght@300;400;600&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body{
+  font-family:'Poppins',sans-serif;
+  background:radial-gradient(ellipse at top,#1a0b2e 0%,#0d0518 60%,#050208 100%);
+  color:#fff; min-height:100vh; overflow-x:hidden; cursor:none;
+}
+.cursor{
+  position:fixed; width:18px; height:18px; border-radius:50%;
+  background:radial-gradient(circle,#ff8fd8 0%,#ff5fa8 70%);
+  pointer-events:none; z-index:9999; mix-blend-mode:screen;
+  transform:translate(-50%,-50%); transition:transform .1s ease;
+  box-shadow:0 0 20px #ff5fa8,0 0 40px #ff5fa8;
+}
+.page-wrap{
+  position:relative; min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center; padding:60px 20px; z-index:2;
+}
+h2{
+  font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4.5vw,2.6rem); margin-bottom:30px;
+  background:linear-gradient(90deg,#ffd7f0,#ffb3e0,#ffd700,#ffb3e0);
+  background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:shimmer 5s linear infinite;
+}
+@keyframes shimmer{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+.fav-list{
+  max-width:650px; width:100%; text-align:left; margin-bottom:30px;
+}
+.fav-item{
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,182,220,.25);
+  backdrop-filter:blur(14px); border-radius:16px; padding:18px 24px; margin-bottom:14px;
+  font-family:'Playfair Display',serif; font-size:1.05rem; color:#ffe3f5;
+  opacity:0; transform:translateX(-30px);
+}
+.fav-item b{ color:#ffd700; }
+.section-label{
+  font-family:'Playfair Display',serif; font-style:italic; font-size:1.1rem;
+  color:#ffb3e0; margin:10px 0 16px; opacity:0;
+}
+.fav-gallery{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:16px; max-width:800px; width:100%; margin-bottom:36px;
+}
+.fav-gallery .media-box{
+  height:180px; border-radius:14px; overflow:hidden; cursor:pointer;
+  border:2px solid rgba(255,182,220,.3); box-shadow:0 8px 22px rgba(0,0,0,.4);
+  transition:transform .4s ease, box-shadow .4s ease; opacity:0;
+}
+.fav-gallery .media-box img{ width:100%; height:100%; object-fit:cover; display:block; }
+.fav-gallery .media-box:hover{ transform:scale(1.05) rotate(1deg); box-shadow:0 12px 30px rgba(255,95,168,.35); }
+.video-row{
+  display:flex; flex-wrap:wrap; justify-content:center; gap:20px;
+  max-width:800px; width:100%; margin-bottom:36px;
+}
+.video-box{
+  width:100%; max-width:280px; border-radius:14px; overflow:hidden; cursor:pointer;
+  border:2px solid rgba(255,182,220,.3); box-shadow:0 8px 22px rgba(0,0,0,.4);
+  background:#000; opacity:0; position:relative; transition:transform .4s ease, box-shadow .4s ease;
+}
+.video-box:hover{ transform:scale(1.03); box-shadow:0 12px 30px rgba(255,95,168,.35); }
+.fav-video{
+  width:100%; height:auto; display:block; object-fit:contain; background:#000;
+  pointer-events:none; /* clicks open the lightbox instead of the native player */
+}
+.play-badge{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:2rem; background:rgba(0,0,0,.2); opacity:0; transition:opacity .3s ease; pointer-events:none;
+}
+.video-box:hover .play-badge{ opacity:1; }
+.nav-button{
+  margin-top:10px; padding:16px 36px; border:none; border-radius:50px;
+  background:linear-gradient(135deg,#ff5fa8,#ff8a5c); color:#fff; font-size:1rem; font-weight:600;
+  cursor:pointer; box-shadow:0 0 25px rgba(255,95,168,.6); transition:all .3s ease;
+  text-decoration:none; display:inline-block; opacity:0;
+}
+.nav-button:hover{ transform:translateY(-4px) scale(1.05); box-shadow:0 8px 35px rgba(255,95,168,.85); }
+.floating-heart{
+  position:fixed; bottom:-50px; font-size:20px; pointer-events:none; z-index:1; opacity:.8;
+  animation:floatUp linear forwards;
+}
+@keyframes floatUp{ to{ transform:translateY(-110vh) rotate(360deg); opacity:0; } }
+.music-toggle{
+  position:fixed; top:20px; right:20px; z-index:100; background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,182,220,.4); color:#fff; border-radius:50%; width:46px; height:46px;
+  font-size:18px; cursor:pointer; backdrop-filter:blur(8px);
+}
+
+/* ===== LIGHTBOX (same as gallery page) ===== */
+.lightbox{
+  position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center;
+  background:rgba(5,2,8,.92); backdrop-filter:blur(6px);
+  opacity:0; visibility:hidden; transition:opacity .35s ease; padding:24px;
+}
+.lightbox.show{ opacity:1; visibility:visible; }
+.lightbox-inner{
+  position:relative; max-width:min(92vw,780px); max-height:88vh; width:100%;
+  display:flex; flex-direction:column; align-items:center; transform:scale(.85);
+  transition:transform .35s ease;
+}
+.lightbox.show .lightbox-inner{ transform:scale(1); }
+.lightbox-inner img, .lightbox-inner video{
+  max-width:100%; max-height:76vh; border-radius:18px;
+  border:2px solid rgba(255,182,220,.4); box-shadow:0 20px 60px rgba(255,95,168,.35);
+  object-fit:contain; background:#000;
+}
+.lightbox-caption{
+  font-family:'Playfair Display',serif; font-style:italic; color:#ffd7ec;
+  margin-top:16px; font-size:1rem; max-width:600px;
+}
+.lightbox-close{
+  position:absolute; top:-46px; right:-6px; width:40px; height:40px; border-radius:50%;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,182,220,.4); color:#fff;
+  font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(8px); transition:transform .25s ease, background .25s ease;
+}
+.lightbox-close:hover{ transform:rotate(90deg) scale(1.1); background:rgba(255,95,168,.3); }
+.lightbox-nav{
+  position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,182,220,.4); color:#fff;
+  font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(8px); transition:transform .25s ease, background .25s ease;
+}
+.lightbox-nav:hover{ background:rgba(255,95,168,.35); transform:translateY(-50%) scale(1.12); }
+.lightbox-prev{ left:-58px; }
+.lightbox-next{ right:-58px; }
+@media (max-width:640px){
+  .lightbox-prev{ left:6px; }
+  .lightbox-next{ right:6px; }
+  .lightbox-close{ top:-40px; right:6px; }
+}
+</style>
+</head>
+<body>
+<div class="cursor"></div>
+<button class="music-toggle" id="musicBtn">🔇</button>
+<audio id="bgMusic" src="music.mp3" loop></audio>
+
+<div class="page-wrap">
+  <h2>Our Memories ✨</h2>
+
+  <p class="section-label">A few of my favorites too 📷</p>
+  <div class="fav-gallery" id="favGallery"></div>
+
+    <p class="section-label"> I know aapda sath photos bau kam chee but memorirs bau che ane ji pn 
+        memories che ee mara mate bau special che 📷</p>
+
+
+  <p class="section-label">Just watch this🎬</p>
+  <div class="video-row" id="videoRow"></div>
+
+  <a href="feelings.html" class="nav-button">What I Feel For You ➡️</a>
+</div>
+
+<!-- ===== LIGHTBOX ===== -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lbClose">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lbPrev">‹</button>
+    <button class="lightbox-nav lightbox-next" id="lbNext">›</button>
+    <div id="lbMediaWrap"></div>
+    <div class="lightbox-caption" id="lbCaption"></div>
+  </div>
+</div>
+
+<script>
+const cursor = document.querySelector('.cursor');
+document.addEventListener('mousemove', e=>{
+  cursor.style.left = e.clientX+'px';
+  cursor.style.top = e.clientY+'px';
+});
+
+// ===== Media data — photos then videos, all open in one shared lightbox =====
+const photos = ['nh1.jpg','nh2.jpg','nh3.jpg','nh4.jpg','nh5.jpg'];
+const videos = [
+  'video1.mp4','video2.mp4','video3.mp4','video4.mp4','video5.mp4',
+  'video6.mp4','video7.mp4','video8.mp4','video9.mp4','video10.mp4'
+];
+const memories = [
+  ...photos.map(src => ({ src, caption:'' })),
+  ...videos.map(src => ({ src, caption:'' }))
+];
+const videoExts = ['mp4','webm','mov','m4v'];
+function isVideo(src){ return videoExts.includes(src.split('.').pop().toLowerCase()); }
+
+// ===== Render photo grid =====
+const favGalleryEl = document.getElementById('favGallery');
+photos.forEach((src, i) => {
+  const box = document.createElement('div');
+  box.className = 'media-box';
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = 'favorite ' + (i + 1);
+  box.appendChild(img);
+  box.addEventListener('click', () => openLightbox(i)); // index into memories array
+  favGalleryEl.appendChild(box);
+});
+
+// ===== Render video row =====
+const videoRowEl = document.getElementById('videoRow');
+videos.forEach((src, i) => {
+  const box = document.createElement('div');
+  box.className = 'video-box';
+  const video = document.createElement('video');
+  video.className = 'fav-video';
+  video.src = src;
+  video.muted = true;
+  video.loop = true;
+  video.playsInline = true;
+  box.appendChild(video);
+  const badge = document.createElement('div');
+  badge.className = 'play-badge';
+  badge.textContent = '▶️';
+  box.appendChild(badge);
+  box.addEventListener('mouseenter', () => video.play().catch(()=>{}));
+  box.addEventListener('mouseleave', () => video.pause());
+  box.addEventListener('click', () => openLightbox(photos.length + i)); // offset past photos
+  videoRowEl.appendChild(box);
+});
+
+gsap.to("h2",{opacity:1,y:0,duration:1,ease:"power3.out"});
+gsap.to(".fav-item",{opacity:1,x:0,stagger:0.25,duration:.8,delay:.4,ease:"power2.out"});
+gsap.to(".section-label",{opacity:1,duration:1,stagger:0.3,delay:2});
+gsap.to(".fav-gallery .media-box",{opacity:1,y:0,stagger:0.15,duration:.8,delay:2.3,ease:"power2.out"});
+gsap.to(".video-box",{opacity:1,duration:1,stagger:0.3,delay:3.3});
+gsap.to(".nav-button",{opacity:1,duration:1,delay:4.2});
+
+// ===== Lightbox logic (same pattern as gallery page) =====
+const lightbox = document.getElementById('lightbox');
+const lbMediaWrap = document.getElementById('lbMediaWrap');
+const lbCaption = document.getElementById('lbCaption');
+const lbClose = document.getElementById('lbClose');
+const lbPrev = document.getElementById('lbPrev');
+const lbNext = document.getElementById('lbNext');
+let currentIndex = 0;
+
+function renderLightboxMedia(index){
+  const item = memories[index];
+  lbMediaWrap.innerHTML = '';
+  if (isVideo(item.src)) {
+    const video = document.createElement('video');
+    video.src = item.src;
+    video.controls = true;
+    video.autoplay = true;
+    video.playsInline = true;
+    lbMediaWrap.appendChild(video);
+  } else {
+    const img = document.createElement('img');
+    img.src = item.src;
+    img.alt = item.caption || 'memory';
+    lbMediaWrap.appendChild(img);
+  }
+  lbCaption.textContent = item.caption || '';
+}
+
+function openLightbox(index){
+  currentIndex = index;
+  renderLightboxMedia(currentIndex);
+  lightbox.classList.add('show');
+  gsap.fromTo(lbMediaWrap, {scale:.8, opacity:0}, {scale:1, opacity:1, duration:.4, ease:"back.out(1.6)"});
+}
+
+function closeLightbox(){
+  lightbox.classList.remove('show');
+  lbMediaWrap.innerHTML = '';
+}
+
+function showNext(dir){
+  currentIndex = (currentIndex + dir + memories.length) % memories.length;
+  renderLightboxMedia(currentIndex);
+  gsap.fromTo(lbMediaWrap, {scale:.9, opacity:0}, {scale:1, opacity:1, duration:.35, ease:"back.out(1.6)"});
+}
+
+lbClose.addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) closeLightbox(); });
+lbPrev.addEventListener('click', ()=> showNext(-1));
+lbNext.addEventListener('click', ()=> showNext(1));
+document.addEventListener('keydown', (e)=>{
+  if(!lightbox.classList.contains('show')) return;
+  if(e.key === 'Escape') closeLightbox();
+  if(e.key === 'ArrowLeft') showNext(-1);
+  if(e.key === 'ArrowRight') showNext(1);
+});
+
+function spawnHeart(){
+  const h = document.createElement('div');
+  h.className='floating-heart';
+  h.textContent = ['💗','💕','💖','✨'][Math.floor(Math.random()*4)];
+  h.style.left = Math.random()*100+'vw';
+  h.style.animationDuration = (6+Math.random()*6)+'s';
+  h.style.fontSize = (14+Math.random()*18)+'px';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),13000);
+}
+setInterval(spawnHeart,700);
+
+const music = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('musicBtn');
+let playing = false;
+musicBtn.addEventListener('click',()=>{
+  if(!playing){ music.play().catch(()=>{}); musicBtn.textContent='🔊'; playing=true; }
+  else { music.pause(); musicBtn.textContent='🔇'; playing=false; }
+});
+</script>
+</body>
+</html>
