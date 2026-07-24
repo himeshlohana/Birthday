@@ -122,22 +122,21 @@ h1{
 <body>
 <div class="cursor"></div>
 <button class="music-toggle" id="musicBtn">🔇</button>
-<audio id="bgMusic" src="music.mp3" loop></audio>
+<audio id="bgMusic" src="music1.mp3" loop></audio>
+<audio id="bgMusic" src="music2.mp3" loop></audio>
+<audio id="bgMusic" src="music3.mp3" loop></audio>
 
 <div class="container" id="landing">
-  <!-- 🔥 Top photo — cycles through a few images. Add/remove <img> tags as needed -->
   <div class="photo-frame" id="photoFrame">
     <img src="n1.jpg" alt="Dobo" class="frame-photo active">
     <img src="n2.jpg" alt="Dobo" class="frame-photo">
     <img src="n3.jpg" alt="Dobo" class="frame-photo">
-    
     <img src="n6.jpg" alt="Dobo" class="frame-photo">
   </div>
 
   <h1>Happy Birthday Dobo 💗</h1>
   <div class="greeting" id="greetText"></div>
 
-  <!-- 🔥 Clickable cake — click to blow out the candle -->
   <div class="cake-wrap" id="cakeWrap">
     <span class="candle-flame" id="candleFlame">🔥</span>
     <span class="cake-emoji">🎂</span>
@@ -147,7 +146,6 @@ h1{
   <button class="cta-button" id="enterBtn">Click to Enter Your World 💕</button>
 </div>
 
-<!-- ===== READY PROMPT ===== -->
 <div class="ready-overlay" id="readyOverlay">
   <div class="ready-question">Are you ready to see the surprise I made for you? ✨</div>
   <div class="ready-sub" id="readySub"></div>
@@ -173,7 +171,7 @@ gsap.to(".cta-button",{opacity:1,duration:1,delay:2.1});
 
 const lines = [
   "Today the world got a little more beautiful, because it's your day.",
-   "This little world I made... is just for you and could be for Us."
+  "This little world I made... is just for you and could be for Us."
 ];
 let li=0, ci=0;
 const greetEl = document.getElementById('greetText');
@@ -202,8 +200,21 @@ function spawnHeart(){
 setInterval(spawnHeart,600);
 
 const music = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('musicBtn');
+let playing = false;
 
-/* ===== PHOTO CAROUSEL: auto-cycle the top photo-frame images ===== */
+musicBtn.addEventListener('click',()=>{
+  if(!playing){
+    music.play().catch(()=>{});
+    musicBtn.textContent='🔊';
+    playing=true;
+  } else {
+    music.pause();
+    musicBtn.textContent='🔇';
+    playing=false;
+  }
+});
+
 const framePhotos = document.querySelectorAll('.frame-photo');
 if (framePhotos.length > 1) {
   let photoIndex = 0;
@@ -214,14 +225,6 @@ if (framePhotos.length > 1) {
   }, 2800);
 }
 
-const musicBtn = document.getElementById('musicBtn');
-let playing = false;
-musicBtn.addEventListener('click',()=>{
-  if(!playing){ music.play().catch(()=>{}); musicBtn.textContent='🔊'; playing=true; }
-  else { music.pause(); musicBtn.textContent='🔇'; playing=false; }
-});
-
-/* ===== CAKE LOGIC: click to blow out the candle ===== */
 const cakeWrap = document.getElementById('cakeWrap');
 const candleFlame = document.getElementById('candleFlame');
 const cakeHint = document.getElementById('cakeHint');
@@ -260,7 +263,6 @@ cakeWrap.addEventListener('click', ()=>{
   }
 });
 
-/* ===== READY PROMPT LOGIC ===== */
 const enterBtn = document.getElementById('enterBtn');
 const readyOverlay = document.getElementById('readyOverlay');
 const readySub = document.getElementById('readySub');
@@ -298,7 +300,6 @@ function dodgeNoBtn(){
   const newY = Math.max(20, Math.random() * maxY);
   noBtn.style.left = newX + 'px';
   noBtn.style.top = newY + 'px';
-
   readySub.textContent = nagMessages[nagIndex % nagMessages.length];
   nagIndex++;
 }
