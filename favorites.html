@@ -181,15 +181,27 @@ document.addEventListener('mousemove', e=>{
 });
 
 // ===== Media data — photos then videos, all open in one shared lightbox =====
-const photos = ['nh1.jpg','nh2.jpg','nh3.jpg','nh4.jpg','nh5.jpg'];
+// ===== Media data — photos then videos, all open in one shared lightbox =====
+const photos = [
+   'n2.jpg',
+   'n4.jpg',
+   'n6.jpg',
+    'n9.jpg',
+   'n13.jpg',
+  'n19.jpg',
+  'n20.jpg',
+    ];
+
 const videos = [
   'video1.mp4','video2.mp4','video3.mp4','video4.mp4','video5.mp4',
-  'video6.mp4','video7.mp4','video8.mp4' 
+   
 ];
+
 const memories = [
   ...photos.map(src => ({ src, caption:'' })),
   ...videos.map(src => ({ src, caption:'' }))
 ];
+
 const videoExts = ['mp4','webm','mov','m4v'];
 function isVideo(src){ return videoExts.includes(src.split('.').pop().toLowerCase()); }
 
